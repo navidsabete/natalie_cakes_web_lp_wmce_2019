@@ -3,6 +3,7 @@ import logo from './Logo.png';
 import loupe from './loupe.jpg';
 import plus from './plus.png';
 import './App.css';
+import { bdd } from './database';
 
 class App extends Component {
   render() {
@@ -44,7 +45,6 @@ class Tableau extends Component{
             <tfoot>
             <tr>
               <td colspan="6">
-                <div class="links"><a href="#">&laquo;</a> <a class="active" href="#">1</a> <a href="#">2</a> <a href="#">3</a> <a href="#">4</a> <a href="#">&raquo;</a></div>
               </td>
             </tr>
             </tfoot>
@@ -57,12 +57,30 @@ class Tableau extends Component{
 }
 
 class Recette extends Component{
+  constructor(props){
+    super(props);
+    this.state = {recette: []};
+}
+
+componentDidMount(){
+  bdd.ref('/Recettes/').once('value', (snapshot)=> {
+    var data = snapshot.val();
+    let recettes = Object.values(data);
+    console.log(recettes);
+      this.setState({recette: recettes});
+}
+);
+}
+
 render() {
   return(
       <tbody>
-      <tr>
-        <td> </td><td> </td><td> </td><td> </td><td><a href="#">Modifier</a></td><td><a href="#">Supprimer</a></td>
+        {this.state.recette.map((item, index)=>
+         { return(
+          <tr>
+        <td><img src={item.image} class="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><a href="#">Supprimer</a></td>
       </tr>
+         )})}
       </tbody>
   );
 }

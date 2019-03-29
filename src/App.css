@@ -92,3 +92,8 @@ button img{
 #plus{
   text-align: right;
 }
+
+.image{
+  height: 100px;
+  width: 200px;
+}
