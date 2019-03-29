@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import logo from './Logo.png';
-import loupe from './loupe.jpg';
 import plus from './plus.png';
 import './App.css';
 
@@ -13,11 +11,6 @@ class App extends Component {
     return (
 
         <div className="App">
-          <header className="App-header">
-            <div>
-              <img src={logo} className="App-logo" alt="logo"/>
-            </div>
-          </header>
           <Tableau/>
           </div>
 
@@ -42,7 +35,7 @@ class Tableau extends Component{
               <th>Difficulté</th>
               <th>Nb. pers.</th>
               <th></th>
-                <th> <Link to="/add"><button ><img src={plus}/></button></Link></th>
+                <th> <Link to="/add"><button ><img src={plus} alt="plus"/></button></Link></th>
             </tr>
             </thead>
             <tfoot>
@@ -81,7 +74,7 @@ render() {
         {this.state.recette.map((item, index)=>
          { return(
           <tr>
-        <td><img src={item.image} class="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><a href="#">Supprimer</a></td>
+        <td><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><a href="#">Supprimer</a></td>
       </tr>
          )})}
       </tbody>

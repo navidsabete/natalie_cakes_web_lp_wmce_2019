@@ -17,33 +17,34 @@ class Form extends React.Component {
         return (
             <div>
                 <form>
-                    <Image/>
+                    <Image/><br/>
+                    
                     <label>Nom</label><br/>
-                    <input type="text" placeholder="Nom"/><br/>
+                    <input type="text" placeholder="Nom"/><br/><br/>
 
                     <label>Difficulté</label><br/>
-                    <input type="text" placeholder="Difficulté"/><br/>
+                    <input type="text" placeholder="Difficulté"/><br/><br/>
                     <Ingredients/>
                     <Materiaux/>
 
                     <label>Nombre pers</label><br/>
-                    <input type="number"/><br/>
+                    <input type="number"/><br/><br/>
 
                     <Tags/>
 
                     <label>Temps de cuisson</label><br/>
-                    <input type="text"/><br/>
+                    <input type="text"/><br/><br/>
 
                     <label>Temps de préparation</label><br/>
-                    <input type="text"/><br/>
+                    <input type="text"/><br/><br/>
 
                     <label>Type</label><br/>
                     <select for="type_select">
                     <option></option>
-                    <option>Je ne</option>
-                    <option>sais plus</option>
-                    <option>les options</option>
-                    </select><br/>
+                    <option>Classique</option>
+                    <option>Bizarre</option>
+                    <option>Tristan est con</option>
+                    </select><br/><br/>
 
 
                     <Link to="/"><input type="button" value="Retour"/></Link>
@@ -56,29 +57,25 @@ class Form extends React.Component {
 
 class Ingredients extends React.Component{
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.delete = this.delete.bind(this);
-        this.state ={
-            Ingredient: []
-        };
+        this.add = this.add.bind(this);
+        this.Ingredient = [];
+        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
     }
 
     add(){
         var title = this.refs.title.value;
-        if(localStorage.getItem('Ingredient') == null){
-            var Ingredient = [];
-            Ingredient.push(title);
-            localStorage.setItem('Ingredient', JSON.stringify(Ingredient));
-        }
-        else{
-            var Ingredient = JSON.parse(localStorage.getItem('Ingredient'));
-            Ingredient.push(title);
-            localStorage.setItem('Ingredient', JSON.stringify(Ingredient));
-        }
-        this.setState({
-            Ingredient: JSON.parse(localStorage.getItem('Ingredient'))
-        });
+        var qte = this.refs.qte.value;
+        var mesure = this.refs.mesure.value;
+
+        var prod = {title :title,
+                    qte : qte,
+                    mesure : mesure}
+        this.Ingredient.push(prod);
+        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
+        this.Ingredient = JSON.parse(localStorage.getItem('Ingredient'));
     }
 
     delete(e){
@@ -93,14 +90,16 @@ class Ingredients extends React.Component{
     render(){
         return(
             <div>
-                <label>Ingredients</label>
-                <input type="text" placeholder="Nouvel Ingredient" ref="title"/>
+                <label>Ingredients</label><br/>
+                <input type="text" placeholder="Nom de l'ingredient" ref="title"/>
+                <input type="text" placeholder="Quantité" ref="qte"/>
+                <input type="text" placeholder="Unité de mesure" ref="mesure"/>
                 <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
                 <br/><br/>
                 <ul>
-                    {this.state.Ingredient.map(function(Ingredients, index){
+                    {this.Ingredient.map(function(item, index){
                         return(
-                            <li key={index}>{Ingredients} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
+                            <li key={index}>{item}<input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
                         )
                     }, this)}
                 </ul>
@@ -149,7 +148,7 @@ class Materiaux extends React.Component{
     render(){
         return(
             <div>
-                <label>Matériel</label>
+                <label>Matériel</label><br/>
                 <input type="text" placeholder="Nouveau Materiel..." ref="title"/>
                 <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
                 <br/><br/>
@@ -206,7 +205,7 @@ class Tags extends React.Component{
     render(){
         return(
             <div>
-                <label>Tags</label>
+                <label>Tags</label><br/>
                 <input type="text" placeholder="Nouveau Tag..." ref="title"/>
                 <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
                 <br/><br/>
@@ -227,7 +226,7 @@ class Image extends React.Component {
         return (
             <div>
                 <img src="#"/>
-                <input type="file" id="image"/>
+                <input type="file" id="image" accept="image/png, image/jpeg"/>
             </div>
 
         );
