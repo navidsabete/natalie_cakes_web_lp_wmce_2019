@@ -3,6 +3,7 @@ import logo from './Logo.png';
 import loupe from './loupe.jpg';
 import plus from './plus.png';
 import './App.css';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 class App extends Component {
   render() {
@@ -38,7 +39,7 @@ class Tableau extends Component{
               <th>Difficulté</th>
               <th>Nb. pers.</th>
               <th></th>
-              <th><button ><img src={plus}/></button></th>
+                <th> <Link to="/add"><button ><img src={plus}/></button></Link></th>
             </tr>
             </thead>
             <tfoot>
