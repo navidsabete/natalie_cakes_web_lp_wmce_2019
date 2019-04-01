@@ -86,10 +86,6 @@ class Recette extends Component {
         });
     }
 
-
-
-
-
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
     var data = snapshot.val();
@@ -115,5 +111,4 @@ render() {
   );
 }
 }
-//onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}
 export default App;

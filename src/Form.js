@@ -1,45 +1,75 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { bdd } from './database';
 
 class Form extends React.Component {
 
-    constructor(){
-        super();
-
+    constructor(props){
+        super(props);
+        this.writeRecetteData = this.writeRecetteData.bind(this);
         this.state ={
-
-            bouton: "Ajouter"
+            bouton: "Ajouter",
         };
+    }
+
+    writeRecetteData (){ 
+        var nom = this.refs.nom.value;
+        var difficulte = this.refs.diff.value;
+        var nb_pers = this.refs.pers.value;
+        var cuisson = this.refs.cuisson.value;
+        var prep = this.refs.prep.value;
+        var type = this.refs.type.value;
+        var ingredient = JSON.parse(localStorage.getItem('Ingredient'));
+        var materiels = JSON.parse(localStorage.getItem('Materiel'));
+        var preparation = JSON.parse(localStorage.getItem('Preparation'));
+
+        console.log(ingredient);
+
+        bdd.ref('Recettes').push({
+            nom: nom,
+            difficulte: difficulte,
+            nb_pers: nb_pers,
+            tps_cuisson: cuisson,
+            tps_prep: prep,
+            type: type,
+            ingredient: ingredient,
+            materiels: materiels,
+            preparation: preparation,
+
+
+         });
     }
 
     render() {
         return (
             <div>
                 <form>
-                    <Image/><br/>
+                    <Image/><br/>   
                     
                     <label>Nom</label><br/>
-                    <input type="text" placeholder="Nom"/><br/><br/>
+                    <input type="text" placeholder="Nom" ref="nom"/><br/><br/>
 
                     <label>Difficulté</label><br/>
-                    <input type="text" placeholder="Difficulté"/><br/><br/>
+                    <input type="text" placeholder="Difficulté" ref="diff"/><br/><br/>
                     <Ingredients/>
                     <Materiaux/>
 
                     <label>Nombre pers</label><br/>
-                    <input type="number"/><br/><br/>
+                    <input type="number" ref="pers"/><br/><br/>
+
+                    <Preparation/>
 
                     <Tags/>
 
                     <label>Temps de cuisson</label><br/>
-                    <input type="text"/><br/><br/>
+                    <input type="text" ref="cuisson"/><br/><br/>
 
                     <label>Temps de préparation</label><br/>
-                    <input type="text"/><br/><br/>
+                    <input type="text" ref="prep"/><br/><br/>
 
                     <label>Type</label><br/>
-                    <select for="type_select">
+                    <select for="type_select" ref="type">
                     <option></option>
                     <option>Classique</option>
                     <option>Bizarre</option>
@@ -48,7 +78,7 @@ class Form extends React.Component {
 
 
                     <Link to="/"><input type="button" value="Retour"/></Link>
-                    <input type="button" value={this.state.bouton}/>
+                    <input type="button" value={this.state.bouton} onClick={this.writeRecetteData}/>
                 </form>
             </div>
         );
@@ -62,15 +92,16 @@ class Ingredients extends React.Component{
         this.delete = this.delete.bind(this);
         this.add = this.add.bind(this);
         this.Ingredient = [];
-        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
     }
 
     add(){
-        var title = this.refs.title.value;
+        var nom = this.refs.nom.value;
         var qte = this.refs.qte.value;
         var mesure = this.refs.mesure.value;
-
-        var prod = {title :title,
+        if(localStorage.getItem('Materiel') == null){
+        
+        }
+        var prod = {nom :nom,
                     qte : qte,
                     mesure : mesure}
         this.Ingredient.push(prod);
@@ -87,11 +118,12 @@ class Ingredients extends React.Component{
         });
         localStorage.setItem('Ingredient', JSON.stringify(list));
     }
+
     render(){
         return(
             <div>
                 <label>Ingredients</label><br/>
-                <input type="text" placeholder="Nom de l'ingredient" ref="title"/>
+                <input type="text" placeholder="Nom de l'ingredient" ref="nom"/>
                 <input type="text" placeholder="Quantité" ref="qte"/>
                 <input type="text" placeholder="Unité de mesure" ref="mesure"/>
                 <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
@@ -99,7 +131,7 @@ class Ingredients extends React.Component{
                 <ul>
                     {this.Ingredient.map(function(item, index){
                         return(
-                            <li key={index}>{item}<input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
+                            <li key={index}>{item.nom} {item.qte} {item.mesure} item<input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
                         )
                     }, this)}
                 </ul>
@@ -156,6 +188,61 @@ class Materiaux extends React.Component{
                     {this.state.Materiel.map(function(Materiels, index){
                         return(
                             <li key={index}>{Materiels} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
+                        )
+                    }, this)}
+                </ul>
+            </div>
+        );
+    }
+}
+
+class Preparation extends React.Component{
+    constructor(){
+        super();
+        this.delete = this.delete.bind(this);
+        this.state ={
+
+            Preparation: []
+        };
+    }
+
+    add(){
+        var title = this.refs.title.value;
+        if(localStorage.getItem('Preparation') == null){
+            var Preparation = [];
+            Preparation.push(title);
+            localStorage.setItem('Preparation', JSON.stringify(Preparation));
+        }
+        else{
+            var Preparation = JSON.parse(localStorage.getItem('Preparation'));
+            Preparation.push(title);
+            localStorage.setItem('Preparation', JSON.stringify(Preparation));
+        }
+        this.setState({
+            Preparation: JSON.parse(localStorage.getItem('Preparation'))
+        });
+    }
+
+    delete(e){
+        var index = e.target.getAttribute('data-key')
+        var list = JSON.parse(localStorage.getItem('Preparation'));
+        list.splice(index,1);
+        this.setState({
+            Preparation: list
+        });
+        localStorage.setItem('Preparation', JSON.stringify(list));
+    }
+    render(){
+        return(
+            <div>
+                <label>Préparation</label><br/>
+                <input type="text" placeholder="Nouvelle étape..." ref="title"/>
+                <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
+                <br/><br/>
+                <ul>
+                    {this.state.Preparation.map(function(Preparation, index){
+                        return(
+                            <li key={index}>{Preparation} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
                         )
                     }, this)}
                 </ul>
