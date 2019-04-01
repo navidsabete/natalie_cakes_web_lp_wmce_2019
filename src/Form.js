@@ -38,7 +38,7 @@ class Form extends React.Component {
         }); 
     }
 
-    async writeRecetteData (){ 
+    writeRecetteData (){ 
         var nom = this.refs.nom.value;
         var difficulte = this.refs.diff.value;
         var nb_pers = this.refs.pers.value;
