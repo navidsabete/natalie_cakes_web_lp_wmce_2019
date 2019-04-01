@@ -8,12 +8,37 @@ class Form extends React.Component {
     constructor(props){
         super(props);
         this.writeRecetteData = this.writeRecetteData.bind(this);
+        this.get = this.get.bind(this);
         this.state ={
             bouton: "Ajouter",
+            idSup: "",
         };
+        this.get();
     }
 
-    writeRecetteData (){ 
+     get(){
+        bdd.ref('Recettes').on("value", (snapchot) => {
+            let data = snapchot.val();
+            let resource = Object.values(data);
+            let tableId = [];
+            let idC = 0;
+            for(var i=0; i<resource.length;i++){
+                    idC = resource[i].id;
+                    if(i==0){
+                    tableId.push(idC);
+                    }
+                    for(let k=0;k<tableId.length;k++){
+                        if(idC<tableId[k]){
+                        idC = tableId[k];
+                        }
+                    }
+                    tableId.push(idC);
+            }
+            this.setState({idSup: idC+1});
+        }); 
+    }
+
+    async writeRecetteData (){ 
         var nom = this.refs.nom.value;
         var difficulte = this.refs.diff.value;
         var nb_pers = this.refs.pers.value;
@@ -24,9 +49,9 @@ class Form extends React.Component {
         var materiels = JSON.parse(localStorage.getItem('Materiel'));
         var preparation = JSON.parse(localStorage.getItem('Preparation'));
 
-        console.log(ingredient);
+        this.get();
 
-        bdd.ref('Recettes').push({
+        bdd.ref('Recettes/recette_'+this.state.idSup).set({
             nom: nom,
             difficulte: difficulte,
             nb_pers: nb_pers,
@@ -36,8 +61,7 @@ class Form extends React.Component {
             ingredient: ingredient,
             materiels: materiels,
             preparation: preparation,
-
-
+            id: this.state.idSup,
          });
     }
 
@@ -131,7 +155,7 @@ class Ingredients extends React.Component{
                 <ul>
                     {this.Ingredient.map(function(item, index){
                         return(
-                            <li key={index}>{item.nom} {item.qte} {item.mesure} item<input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
+                            <li key={index}>{item.nom} {item.qte} {item.mesure} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
                         )
                     }, this)}
                 </ul>
