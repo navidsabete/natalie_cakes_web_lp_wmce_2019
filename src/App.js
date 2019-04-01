@@ -59,9 +59,15 @@ class Recette extends Component {
         super(props);
         this.state = {recette: []};
 
+
     }
 
     Supprimer(id, nom, index) {
+        console.log(id);
+        var key;
+        bdd.ref('/Recettes/').once('value', (snapshot)=> {
+            key = Object.keys(snapshot.val())[id];
+        });
 
         confirmAlert({
             title: 'Supprimer une recette',
@@ -69,11 +75,11 @@ class Recette extends Component {
             buttons: [
                 {
                     label: 'Supprimer',
-                    onClick: () => bdd.ref(`/Recettes/${id}`).remove()
+                    onClick: () => bdd.ref(`/Recettes/${key}`).remove()
                 },
                 {
                     label: 'Annuler',
-                    onClick: () => alert(index)
+                    onClick: () => alert(key)
 
                 }
             ]
@@ -81,15 +87,14 @@ class Recette extends Component {
     }
 
 
-    removeProject(projectId) {
-        const projectRef= bdd.ref(`/Recettes/${projectId}`);
-        projectRef.remove();
-    }
+
 
 
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
     var data = snapshot.val();
+    var key = Object.keys(snapshot.val())[0];
+    console.log(key);
     let recettes = Object.values(data);
     console.log(recettes);
       this.setState({recette: recettes});
@@ -103,7 +108,7 @@ render() {
         {this.state.recette.map((item, index)=>
          { return(
           <tr>
-        <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
+        <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, index, item.nom)}/></td>
       </tr>
          )})}
       </tbody>
