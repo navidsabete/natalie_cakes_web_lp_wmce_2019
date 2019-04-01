@@ -6,6 +6,7 @@
     "firebase": "^5.9.2",
     "materialize-css": "^1.0.0",
     "react": "^16.8.6",
+    "react-confirm-alert": "^2.4.0",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "react-scripts": "^2.1.8"

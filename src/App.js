@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import plus from './plus.png';
 import './App.css';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import { bdd } from './database';
 
@@ -40,7 +42,7 @@ class Tableau extends Component{
             </thead>
             <tfoot>
             <tr>
-              <td colspan="6">
+              <td colSpan="6">
               </td>
             </tr>
             </tfoot>
@@ -52,11 +54,38 @@ class Tableau extends Component{
   }
 }
 
-class Recette extends Component{
-  constructor(props){
-    super(props);
-    this.state = {recette: []};
-}
+class Recette extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {recette: []};
+
+    }
+
+    Supprimer(id, nom, index) {
+
+        confirmAlert({
+            title: 'Supprimer une recette',
+            message: 'Voulez vous vraiment supprimer cette recette: ' + nom,
+            buttons: [
+                {
+                    label: 'Supprimer',
+                    onClick: () => bdd.ref(`/Recettes/${id}`).remove()
+                },
+                {
+                    label: 'Annuler',
+                    onClick: () => alert(index)
+
+                }
+            ]
+        });
+    }
+
+
+    removeProject(projectId) {
+        const projectRef= bdd.ref(`/Recettes/${projectId}`);
+        projectRef.remove();
+    }
+
 
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
@@ -74,12 +103,12 @@ render() {
         {this.state.recette.map((item, index)=>
          { return(
           <tr>
-        <td><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><a href="#">Supprimer</a></td>
+        <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><a href="#">Modifier</a></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
       </tr>
          )})}
       </tbody>
   );
 }
 }
-
+//onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}
 export default App;
