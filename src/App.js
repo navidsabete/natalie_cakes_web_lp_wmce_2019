@@ -58,36 +58,48 @@ class Recette extends Component {
     constructor(props) {
         super(props);
         this.state = {recette: []};
-
+        this.Supprimer = this.Supprimer.bind(this);
 
     }
 
     Supprimer(id, nom, index) {
-
         confirmAlert({
             title: 'Supprimer une recette',
             message: 'Voulez vous vraiment supprimer cette recette: ' + nom,
             buttons: [
                 {
                     label: 'Supprimer',
-                    onClick: () => bdd.ref(`/Recettes/recette_${id}`).remove()
+                    onClick: () => {
+                        bdd.ref(`/Recettes/recette_${id}`).remove();
+
+
+
+                        bdd.ref('/Recettes/').once('value', (snapshot)=> {
+                                var data = snapshot.val();
+                                //console.log(data);
+                                let recettes = Object.values(data);
+                                //console.log(recettes);
+                                this.setState({recette: recettes});
+                            }
+                        );
+                    }
                 },
                 {
                     label: 'Annuler',
-                    onClick: () => alert(id)
 
                 }
             ]
         });
+
     }
 
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
     var data = snapshot.val();
-    console.log(data);
+    //console.log(data);
     let recettes = Object.values(data);
-    console.log(recettes);
-      this.setState({recette: recettes});
+    //console.log(recettes);
+    this.setState({recette: recettes});
 }
 );
 }
@@ -98,7 +110,7 @@ render() {
         {this.state.recette.map((item, index)=>
          { return(
           <tr>
-              <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><Link to={"/edit/?id="+ item.id}><input type="button" value="Modifier"/></Link></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
+              <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><Link to={"/edit/"+ item.id}><input type="button" value="Modifier"/></Link></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
       </tr>
          )})}
       </tbody>

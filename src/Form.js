@@ -2,27 +2,53 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { bdd } from './database';
-
+var modif = "";
 class Form extends React.Component {
+
 
     constructor(props){
         super(props);
+        modif = "0";
+        localStorage.removeItem('Ingredient');
+        localStorage.removeItem('Materiel');
+        localStorage.removeItem('Preparation');
+        localStorage.removeItem('Tags');
         this.writeRecetteData = this.writeRecetteData.bind(this);
         this.get = this.get.bind(this);
         this.getBase64 = this.getBase64.bind(this)
         this.state ={
-            bouton: "Ajouter",
             idSup: "",
             image:"",
         };
 
         this.get();
+        console.log(this.props.match.params.id);
     }
 
+    componentDidMount(){
+        if (typeof this.props.match.params.id !== 'undefined') {
+            modif = "1";
+            bdd.ref('/Recettes/recette_'+this.props.match.params.id).once('value', (snapshot) => {
+                    var data = snapshot.val();
+                    //console.log(data);
+                    let recettes = Object.values(data);
+                    console.log(recettes);
+                    this.setState({recette: recettes});
+                this.setState({bouton: "Modifer"});
+                }
+            );
+        }
+        else{
+            this.setState({bouton: "Ajouter"});
+        }
+
+    }
+
+
     getBase64(e) {
-        var file = e.target.files[0]
-        let reader = new FileReader()
-        reader.readAsDataURL(file)
+        var file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
         reader.onload = () => {
           this.setState({
             image: reader.result
@@ -41,7 +67,7 @@ class Form extends React.Component {
             let idC = 0;
             for(var i=0; i<resource.length;i++){
                     idC = resource[i].id;
-                    if(i==0){
+                    if(i===0){
                     tableId.push(idC);
                     }
                     for(let k=0;k<tableId.length;k++){
@@ -82,6 +108,14 @@ class Form extends React.Component {
             id: this.state.idSup,
             image: image,
          });
+
+
+        localStorage.removeItem('Ingredient');
+        localStorage.removeItem('Materiel');
+        localStorage.removeItem('Preparation');
+        localStorage.removeItem('Tags');
+
+        this.props.history.push('/');
     }
 
     render() {
@@ -112,8 +146,8 @@ class Form extends React.Component {
                     <label>Temps de préparation</label><br/>
                     <input type="text" ref="prep"/><br/><br/>
 
-                    <label>Type</label><br/>
-                    <select for="type_select" ref="type">
+                    <label >Type</label><br/>
+                    <select name="type_select" ref="type">
                     <option></option>
                     <option>Classique</option>
                     <option>Bizarre</option>
@@ -138,28 +172,35 @@ class Ingredients extends React.Component{
     }
 
     add(){
+
         var nom = this.refs.nom.value;
         var qte = this.refs.qte.value;
         var mesure = this.refs.mesure.value;
-        if(localStorage.getItem('Materiel') == null){
-        
-        }
+
         var prod = {nom :nom,
                     qte : parseInt(qte),
-                    mesure : mesure}
+                    mesure : mesure};
+
+        console.log(this.Ingredient);
         this.Ingredient.push(prod);
         localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
-        this.Ingredient = JSON.parse(localStorage.getItem('Ingredient'));
+
+        this.setState({
+            Ingredient: this.Ingredient
+        });
+        console.log(this.Ingredient);
     }
 
     delete(e){
         var index = e.target.getAttribute('data-key')
-        var list = JSON.parse(localStorage.getItem('Ingredient'));
-        list.splice(index,1);
+
+        this.Ingredient.splice(index,1);
+
+        console.log(this.Ingredient);
         this.setState({
-            Ingredient: list
+            Ingredient: this.Ingredient
         });
-        localStorage.setItem('Ingredient', JSON.stringify(list));
+        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
     }
 
     render(){
@@ -196,13 +237,13 @@ class Materiaux extends React.Component{
 
     add(){
         var title = this.refs.title.value;
+        var Materiel = [];
         if(localStorage.getItem('Materiel') == null){
-            var Materiel = [];
             Materiel.push(title);
             localStorage.setItem('Materiel', JSON.stringify(Materiel));
         }
         else{
-            var Materiel = JSON.parse(localStorage.getItem('Materiel'));
+            Materiel = JSON.parse(localStorage.getItem('Materiel'));
             Materiel.push(title);
             localStorage.setItem('Materiel', JSON.stringify(Materiel));
         }
@@ -352,3 +393,4 @@ class Tags extends React.Component{
 }
 
 export default Form;
+
