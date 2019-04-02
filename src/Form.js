@@ -2,30 +2,53 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { bdd } from './database';
-
+var modif = "";
 class Form extends React.Component {
+
 
     constructor(props){
         super(props);
-        this.writeRecetteData = this.writeRecetteData.bind(this);
-        this.get = this.get.bind(this);
-        this.getBase64 = this.getBase64.bind(this)
-        this.state ={
-            bouton: "Ajouter",
-            idSup: "",
-            image:"",
-        };
+        modif = "0";
         localStorage.removeItem('Ingredient');
         localStorage.removeItem('Materiel');
         localStorage.removeItem('Preparation');
         localStorage.removeItem('Tags');
+        this.writeRecetteData = this.writeRecetteData.bind(this);
+        this.get = this.get.bind(this);
+        this.getBase64 = this.getBase64.bind(this)
+        this.state ={
+            idSup: "",
+            image:"",
+        };
+
         this.get();
+        console.log(this.props.match.params.id);
     }
 
+    componentDidMount(){
+        if (typeof this.props.match.params.id !== 'undefined') {
+            modif = "1";
+            bdd.ref('/Recettes/recette_'+this.props.match.params.id).once('value', (snapshot) => {
+                    var data = snapshot.val();
+                    //console.log(data);
+                    let recettes = Object.values(data);
+                    console.log(recettes);
+                    this.setState({recette: recettes});
+                this.setState({bouton: "Modifer"});
+                }
+            );
+        }
+        else{
+            this.setState({bouton: "Ajouter"});
+        }
+
+    }
+
+
     getBase64(e) {
-        var file = e.target.files[0]
-        let reader = new FileReader()
-        reader.readAsDataURL(file)
+        var file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
         reader.onload = () => {
           this.setState({
             image: reader.result
