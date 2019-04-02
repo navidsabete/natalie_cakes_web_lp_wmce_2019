@@ -110,7 +110,7 @@ render() {
         {this.state.recette.map((item, index)=>
          { return(
           <tr>
-              <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><Link to={"/edit/?id="+ item.id}><input type="button" value="Modifier"/></Link></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
+              <td key={index}><img src={item.image} className="image" alt="image"/></td><td>{item.nom}</td><td>{item.difficulte}</td><td>{item.nb_pers}</td><td><Link to={"/edit/"+ item.id}><input type="button" value="Modifier"/></Link></td><td><input type="button" value="Supprimer" onClick={this.Supprimer.bind(item.nom, item.id, item.nom)}/></td>
       </tr>
          )})}
       </tbody>
