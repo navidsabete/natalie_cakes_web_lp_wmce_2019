@@ -15,7 +15,10 @@ class Form extends React.Component {
             idSup: "",
             image:"",
         };
-
+        localStorage.removeItem('Ingredient');
+        localStorage.removeItem('Materiel');
+        localStorage.removeItem('Preparation');
+        localStorage.removeItem('Tags');
         this.get();
     }
 
@@ -41,7 +44,7 @@ class Form extends React.Component {
             let idC = 0;
             for(var i=0; i<resource.length;i++){
                     idC = resource[i].id;
-                    if(i==0){
+                    if(i===0){
                     tableId.push(idC);
                     }
                     for(let k=0;k<tableId.length;k++){
@@ -82,6 +85,14 @@ class Form extends React.Component {
             id: this.state.idSup,
             image: image,
          });
+
+
+        localStorage.removeItem('Ingredient');
+        localStorage.removeItem('Materiel');
+        localStorage.removeItem('Preparation');
+        localStorage.removeItem('Tags');
+
+        this.props.history.push('/');
     }
 
     render() {
@@ -112,8 +123,8 @@ class Form extends React.Component {
                     <label>Temps de préparation</label><br/>
                     <input type="text" ref="prep"/><br/><br/>
 
-                    <label>Type</label><br/>
-                    <select for="type_select" ref="type">
+                    <label >Type</label><br/>
+                    <select name="type_select" ref="type">
                     <option></option>
                     <option>Classique</option>
                     <option>Bizarre</option>
@@ -138,28 +149,35 @@ class Ingredients extends React.Component{
     }
 
     add(){
+
         var nom = this.refs.nom.value;
         var qte = this.refs.qte.value;
         var mesure = this.refs.mesure.value;
-        if(localStorage.getItem('Materiel') == null){
-        
-        }
+
         var prod = {nom :nom,
                     qte : parseInt(qte),
-                    mesure : mesure}
+                    mesure : mesure};
+
+        console.log(this.Ingredient);
         this.Ingredient.push(prod);
         localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
-        this.Ingredient = JSON.parse(localStorage.getItem('Ingredient'));
+
+        this.setState({
+            Ingredient: this.Ingredient
+        });
+        console.log(this.Ingredient);
     }
 
     delete(e){
         var index = e.target.getAttribute('data-key')
-        var list = JSON.parse(localStorage.getItem('Ingredient'));
-        list.splice(index,1);
+
+        this.Ingredient.splice(index,1);
+
+        console.log(this.Ingredient);
         this.setState({
-            Ingredient: list
+            Ingredient: this.Ingredient
         });
-        localStorage.setItem('Ingredient', JSON.stringify(list));
+        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
     }
 
     render(){
@@ -196,13 +214,13 @@ class Materiaux extends React.Component{
 
     add(){
         var title = this.refs.title.value;
+        var Materiel = [];
         if(localStorage.getItem('Materiel') == null){
-            var Materiel = [];
             Materiel.push(title);
             localStorage.setItem('Materiel', JSON.stringify(Materiel));
         }
         else{
-            var Materiel = JSON.parse(localStorage.getItem('Materiel'));
+            Materiel = JSON.parse(localStorage.getItem('Materiel'));
             Materiel.push(title);
             localStorage.setItem('Materiel', JSON.stringify(Materiel));
         }
@@ -352,3 +370,4 @@ class Tags extends React.Component{
 }
 
 export default Form;
+

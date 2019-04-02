@@ -63,7 +63,6 @@ class Recette extends Component {
     }
 
     Supprimer(id, nom, index) {
-        var verif = "false";
         confirmAlert({
             title: 'Supprimer une recette',
             message: 'Voulez vous vraiment supprimer cette recette: ' + nom,
@@ -73,7 +72,7 @@ class Recette extends Component {
                     onClick: () => {
                         bdd.ref(`/Recettes/recette_${id}`).remove();
 
-                        verif = "true"
+
 
                         bdd.ref('/Recettes/').once('value', (snapshot)=> {
                                 var data = snapshot.val();
@@ -87,7 +86,6 @@ class Recette extends Component {
                 },
                 {
                     label: 'Annuler',
-                    onClick: () => verif = "false"
 
                 }
             ]
