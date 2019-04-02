@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.16.1",
     "firebase": "^5.9.2",
-    "material-components-web": "^1.1.0",
-    "materialize-css": "^1.0.0",
     "react": "^16.8.6",
     "react-confirm-alert": "^2.4.0",
     "react-dom": "^16.8.6",
