@@ -58,36 +58,50 @@ class Recette extends Component {
     constructor(props) {
         super(props);
         this.state = {recette: []};
-
+        this.Supprimer = this.Supprimer.bind(this);
 
     }
 
     Supprimer(id, nom, index) {
-
+        var verif = "false";
         confirmAlert({
             title: 'Supprimer une recette',
             message: 'Voulez vous vraiment supprimer cette recette: ' + nom,
             buttons: [
                 {
                     label: 'Supprimer',
-                    onClick: () => bdd.ref(`/Recettes/recette_${id}`).remove()
+                    onClick: () => {
+                        bdd.ref(`/Recettes/recette_${id}`).remove();
+
+                        verif = "true"
+
+                        bdd.ref('/Recettes/').once('value', (snapshot)=> {
+                                var data = snapshot.val();
+                                //console.log(data);
+                                let recettes = Object.values(data);
+                                //console.log(recettes);
+                                this.setState({recette: recettes});
+                            }
+                        );
+                    }
                 },
                 {
                     label: 'Annuler',
-                    onClick: () => alert(id)
+                    onClick: () => verif = "false"
 
                 }
             ]
         });
+
     }
 
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
     var data = snapshot.val();
-    console.log(data);
+    //console.log(data);
     let recettes = Object.values(data);
-    console.log(recettes);
-      this.setState({recette: recettes});
+    //console.log(recettes);
+    this.setState({recette: recettes});
 }
 );
 }
