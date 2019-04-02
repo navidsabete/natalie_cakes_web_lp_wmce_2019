@@ -84,7 +84,6 @@ class Recette extends Component {
 componentDidMount(){
   bdd.ref('/Recettes/').once('value', (snapshot)=> {
     var data = snapshot.val();
-    var key = Object.keys(snapshot.val())[0];
     console.log(data);
     let recettes = Object.values(data);
     console.log(recettes);

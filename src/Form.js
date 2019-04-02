@@ -9,12 +9,29 @@ class Form extends React.Component {
         super(props);
         this.writeRecetteData = this.writeRecetteData.bind(this);
         this.get = this.get.bind(this);
+        this.getBase64 = this.getBase64.bind(this)
         this.state ={
             bouton: "Ajouter",
             idSup: "",
+            image:"",
         };
+
         this.get();
     }
+
+    getBase64(e) {
+        var file = e.target.files[0]
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => {
+          this.setState({
+            image: reader.result
+          })
+        };
+        reader.onerror = function (error) {
+          console.log('Error: ', error);
+        }
+      }
 
      get(){
         bdd.ref('Recettes').on("value", (snapchot) => {
@@ -48,20 +65,22 @@ class Form extends React.Component {
         var ingredient = JSON.parse(localStorage.getItem('Ingredient'));
         var materiels = JSON.parse(localStorage.getItem('Materiel'));
         var preparation = JSON.parse(localStorage.getItem('Preparation'));
+        var image = this.state.image;
 
         this.get();
 
         bdd.ref('Recettes/recette_'+this.state.idSup).set({
             nom: nom,
-            difficulte: difficulte,
-            nb_pers: nb_pers,
+            difficulte: parseInt(difficulte),
+            nb_pers: parseInt(nb_pers),
             tps_cuisson: cuisson,
             tps_prep: prep,
             type: type,
-            ingredient: ingredient,
+            ingredients: ingredient,
             materiels: materiels,
             preparation: preparation,
             id: this.state.idSup,
+            image: image,
          });
     }
 
@@ -69,13 +88,14 @@ class Form extends React.Component {
         return (
             <div>
                 <form>
-                    <Image/><br/>   
+                    <img src={this.state.image}/>
+                    <input type="file" accept="image/png, image/jpeg"  name="imgUpload"  onChange={this.getBase64}/><br/>   
                     
                     <label>Nom</label><br/>
                     <input type="text" placeholder="Nom" ref="nom"/><br/><br/>
 
                     <label>Difficulté</label><br/>
-                    <input type="text" placeholder="Difficulté" ref="diff"/><br/><br/>
+                    <input type="number" ref="diff"/><br/><br/>
                     <Ingredients/>
                     <Materiaux/>
 
@@ -97,7 +117,6 @@ class Form extends React.Component {
                     <option></option>
                     <option>Classique</option>
                     <option>Bizarre</option>
-                    <option>Tristan est con</option>
                     </select><br/><br/>
 
 
@@ -126,7 +145,7 @@ class Ingredients extends React.Component{
         
         }
         var prod = {nom :nom,
-                    qte : qte,
+                    qte : parseInt(qte),
                     mesure : mesure}
         this.Ingredient.push(prod);
         localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
@@ -148,7 +167,7 @@ class Ingredients extends React.Component{
             <div>
                 <label>Ingredients</label><br/>
                 <input type="text" placeholder="Nom de l'ingredient" ref="nom"/>
-                <input type="text" placeholder="Quantité" ref="qte"/>
+                <input type="number" placeholder="Quantité" ref="qte"/>
                 <input type="text" placeholder="Unité de mesure" ref="mesure"/>
                 <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
                 <br/><br/>
@@ -332,15 +351,4 @@ class Tags extends React.Component{
     }
 }
 
-class Image extends React.Component {
-    render() {
-        return (
-            <div>
-                <img src="#"/>
-                <input type="file" id="image" accept="image/png, image/jpeg"/>
-            </div>
-
-        );
-    }
-}
 export default Form;
