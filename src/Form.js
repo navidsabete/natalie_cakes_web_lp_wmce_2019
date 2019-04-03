@@ -131,18 +131,22 @@ class Formulaire extends React.Component {
             var ingredient = values.ingredient;
             var materiaux = values.materiaux;
             var preparation = values.preparation;
-           // var image =  this.getBase64(values.fileList);
-           
-           /* var file = values.upload.thumbUrl;
-            let reader = new FileReader();
-            reader.readAsDataURL(file);
-            console.log(reader.result);
-            reader.onload = () => {
-              this.setState({
-                image: reader.result
-              })
-            };*/
-    
+            var image =  values.upload.file.thumbUrl;
+              /*
+               var file = values.upload.thumbUrl;
+               let reader = new FileReader();
+               reader.readAsDataURL(file);
+               console.log(reader.result);
+
+               reader.onload = () => {
+                 this.setState({
+                   image: reader.result
+                 })
+               };
+
+               var image = reader.result;*/
+               //console.log(image);
+
             this.get();
     
             bdd.ref('Recettes/recette_'+this.state.idSup).set({
@@ -156,7 +160,7 @@ class Formulaire extends React.Component {
                 materiels: materiaux,
                 preparation: preparation,
                 id: this.state.idSup,
-                image: "image de Test",
+                image: image,
              });
              this.props.history.push('/');
           }
@@ -391,6 +395,7 @@ class Formulaire extends React.Component {
         onChange(info) {
           if (info.file.status !== 'uploading') {
             console.log(info.file, info.fileList);
+            //console.log(info.file.thumbUrl);
           }
           if (info.file.status === 'done') {
             message.success(`${info.file.name} file uploaded successfully`);
