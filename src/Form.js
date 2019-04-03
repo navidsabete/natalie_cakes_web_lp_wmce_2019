@@ -2,23 +2,178 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { bdd } from './database';
-var modif = "";
-class Form extends React.Component {
+import {Form, Select, InputNumber, Button, Upload, Icon, Rate, Input, message} from 'antd';
+import 'antd/dist/antd.css';
 
+const { Option } = Select;
+var modif = "";
+let id = 0;
+
+class Formulaire extends React.Component {
+    removeI = (k) => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_ing = form.getFieldValue('keys_ing');
+        // We need at least one passenger
+        if (keys_ing.length === 1) {
+          return;
+        }
+
+    // can use data-binding to set
+    form.setFieldsValue({
+        keys_ing: keys_ing.filter(key => key !== k),
+      });
+    }
+    removeM = (k) => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_mat = form.getFieldValue('keys_mat');
+        // We need at least one passenger
+        if (keys_mat.length === 1) {
+          return;
+        }
+
+    // can use data-binding to set
+    form.setFieldsValue({
+        keys_mat: keys_mat.filter(key => key !== k),
+      });
+    }
+
+    removeP = (k) => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_prep = form.getFieldValue('keys_prep');
+        // We need at least one passenger
+        if (keys_prep.length === 1) {
+          return;
+        }
+
+    // can use data-binding to set
+    form.setFieldsValue({
+        keys_prep: keys_prep.filter(key => key !== k),
+      });
+    }
+
+    removeT = (k) => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_tag = form.getFieldValue('keys_tag');
+        // We need at least one passenger
+        if (keys_tag.length === 1) {
+          return;
+        }
+
+    // can use data-binding to set
+    form.setFieldsValue({
+        keys_tag: keys_tag.filter(key => key !== k),
+      });
+    }
+
+    addI = () => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_ing = form.getFieldValue('keys_ing');
+        const nextKeys_ing = keys_ing.concat(id++);
+        // can use data-binding to set
+        // important! notify form to detect changes
+        form.setFieldsValue({
+          keys_ing: nextKeys_ing,
+        });
+    }
+
+    addM = () => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_mat = form.getFieldValue('keys_mat');
+        const nextKeys_mat = keys_mat.concat(id++);
+        // can use data-binding to set
+        // important! notify form to detect changes
+        form.setFieldsValue({
+          keys_mat: nextKeys_mat,
+        });
+    }
+
+    addP = () => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_prep = form.getFieldValue('keys_prep');
+        const nextKeys_prep = keys_prep.concat(id++);
+        // can use data-binding to set
+        // important! notify form to detect changes
+        form.setFieldsValue({
+          keys_prep: nextKeys_prep,
+        });
+    }
+
+    addT = () => {
+        const { form } = this.props;
+        // can use data-binding to get
+        const keys_tag = form.getFieldValue('keys_tag');
+        const nextKeys_tag = keys_tag.concat(id++);
+        // can use data-binding to set
+        // important! notify form to detect changes
+        form.setFieldsValue({
+          keys_tag: nextKeys_tag,
+        });
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+          if (!err) {
+            console.log('Received values of form: ', values);
+            var nom = values.name;
+            var difficulte = values.rate;
+            var nb_pers = values.nb_pers;
+            var tps_cuis = values.tps_cuis;
+            var tps_prep = values.tps_prep;
+            var type = values.select;
+            var ingredient = values.ingredient;
+            var materiaux = values.materiaux;
+            var preparation = values.preparation;
+           // var image =  this.getBase64(values.fileList);
+           
+           /* var file = values.upload.thumbUrl;
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            console.log(reader.result);
+            reader.onload = () => {
+              this.setState({
+                image: reader.result
+              })
+            };*/
+    
+            this.get();
+    
+            bdd.ref('Recettes/recette_'+this.state.idSup).set({
+                nom: nom,
+                difficulte: parseInt(difficulte),
+                nb_pers: parseInt(nb_pers),
+                tps_cuisson: tps_cuis,
+                tps_prep: tps_prep,
+                type: type,
+                ingredients: ingredient,
+                materiels: materiaux,
+                preparation: preparation,
+                id: this.state.idSup,
+                image: "image de Test",
+             });
+             this.props.history.push('/');
+          }
+          else{
+            alert("Veuillez remplir tous les champs")
+          }
+        });
+      }
 
     constructor(props){
         super(props);
         modif = "0";
-        localStorage.removeItem('Ingredient');
-        localStorage.removeItem('Materiel');
-        localStorage.removeItem('Preparation');
-        localStorage.removeItem('Tags');
-        this.writeRecetteData = this.writeRecetteData.bind(this);
         this.get = this.get.bind(this);
-        this.getBase64 = this.getBase64.bind(this)
+        this.getBase64 = this.getBase64.bind(this);
         this.state ={
             idSup: "",
-            image:"",
+            imageUrl:"",
         };
 
         this.get();
@@ -44,21 +199,6 @@ class Form extends React.Component {
 
     }
 
-
-    getBase64(e) {
-        var file = e.target.files[0];
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          this.setState({
-            image: reader.result
-          })
-        };
-        reader.onerror = function (error) {
-          console.log('Error: ', error);
-        }
-      }
-
      get(){
         bdd.ref('Recettes').on("value", (snapchot) => {
             let data = snapchot.val();
@@ -81,316 +221,294 @@ class Form extends React.Component {
         }); 
     }
 
-    writeRecetteData (){ 
-        var nom = this.refs.nom.value;
-        var difficulte = this.refs.diff.value;
-        var nb_pers = this.refs.pers.value;
-        var cuisson = this.refs.cuisson.value;
-        var prep = this.refs.prep.value;
-        var type = this.refs.type.value;
-        var ingredient = JSON.parse(localStorage.getItem('Ingredient'));
-        var materiels = JSON.parse(localStorage.getItem('Materiel'));
-        var preparation = JSON.parse(localStorage.getItem('Preparation'));
-        var image = this.state.image;
-
-        this.get();
-
-        bdd.ref('Recettes/recette_'+this.state.idSup).set({
-            nom: nom,
-            difficulte: parseInt(difficulte),
-            nb_pers: parseInt(nb_pers),
-            tps_cuisson: cuisson,
-            tps_prep: prep,
-            type: type,
-            ingredients: ingredient,
-            materiels: materiels,
-            preparation: preparation,
-            id: this.state.idSup,
-            image: image,
-         });
-
-
-        localStorage.removeItem('Ingredient');
-        localStorage.removeItem('Materiel');
-        localStorage.removeItem('Preparation');
-        localStorage.removeItem('Tags');
-
-        this.props.history.push('/');
-    }
+    getBase64(img) {
+        console.log(img);
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        this.setState({imageUrl: reader.result});
+      }
 
     render() {
+        const { getFieldDecorator, getFieldValue } = this.props.form;
+        const formItemLayout = {
+            labelCol: { span: 7 },
+            wrapperCol: { span: 10 },
+          };
+          const formItemLayoutWithOutLabel = {
+            wrapperCol: {
+              xs: { span: 24, offset: 0 },
+              sm: { span: 20, offset: 4 },
+            },
+          };
+          getFieldDecorator('keys_ing', { initialValue: [] });
+          getFieldDecorator('keys_mat', { initialValue: [] });
+          getFieldDecorator('keys_prep', { initialValue: [] });
+          getFieldDecorator('keys_tag', { initialValue: [] });
+          const keys_ing = getFieldValue('keys_ing');
+          const keys_mat = getFieldValue('keys_mat');
+          const keys_prep = getFieldValue('keys_prep');
+          const keys_tag = getFieldValue('keys_tag');
+
+
+    const formItems = keys_ing.map((k, index) => (
+      <Form.Item
+        {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+        label={index === 0 ? 'Ingrédients' : ''}
+        required={false}
+        key={k}
+      >
+        {getFieldDecorator(`ingredient[${k}].nom`, {
+          validateTrigger: ['onChange', 'onBlur'],
+          rules: [{
+            required: true,
+            whitespace: true,
+            message: "Veuillez ajouter le nom de l'ingrédient.",
+          }],
+        })(
+          <Input placeholder="nom de l'ingrédient" style={{ width: '60%', marginRight: 8 }} />
+        )}
+        {getFieldDecorator(`ingredient[${k}].quantite`, {
+          validateTrigger: ['onChange', 'onBlur'],
+          rules: [{
+            required: true,
+            whitespace: true,
+            message: "Veuillez ajouter la quantité de l'ingrédient.",
+          }],
+        })(
+          <InputNumber placeholder="quantité de l'ingrédient" style={{ width: '60%', marginRight: 8 }} />
+        )}
+        {getFieldDecorator(`ingredient[${k}].mesure`, {
+          validateTrigger: ['onChange', 'onBlur'],
+          rules: [{
+            required: true,
+            whitespace: true,
+            message: "Veuillez ajouter l'unité de l'ingrédient.",
+          }],
+        })(
+          <Input placeholder="unité de l'ingrédient" style={{ width: '60%', marginRight: 8 }} />
+        )}
+        {keys_ing.length > 1 ? (
+          <Icon
+            className="dynamic-delete-button"
+            type="minus-circle-o"
+            disabled={keys_ing.length === 1}
+            onClick={() => this.removeI(k)}
+          />
+        ) : null}
+      </Form.Item>
+    ));
+
+    const formItems2 = keys_mat.map((k, index) => (
+        <Form.Item
+          {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+          label={index === 0 ? 'Matériaux' : ''}
+          required={false}
+          key={k}
+        >
+          {getFieldDecorator(`materiaux[${k}]`, {
+            validateTrigger: ['onChange', 'onBlur'],
+            rules: [{
+              required: true,
+              whitespace: true,
+              message: "Veuillez ajouter un ustensile.",
+            }],
+          })(
+            <Input placeholder="nom de l'ustencile" style={{ width: '60%', marginRight: 8 }} />
+          )}
+          {keys_mat.length > 1 ? (
+            <Icon
+              className="dynamic-delete-button"
+              type="minus-circle-o"
+              disabled={keys_mat.length === 1}
+              onClick={() => this.removeM(k)}
+            />
+          ) : null}
+        </Form.Item>
+      ));
+
+      const formItems3 = keys_prep.map((k, index) => (
+        <Form.Item
+          {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+          label={index === 0 ? 'Préparation' : ''}
+          required={false}
+          key={k}
+        >
+          {getFieldDecorator(`preparation[${k}]`, {
+            validateTrigger: ['onChange', 'onBlur'],
+            rules: [{
+              required: true,
+              whitespace: true,
+              message: "Veuillez ajouter une étape de préparation.",
+            }],
+          })(
+            <Input placeholder="intitulé de l'étape" style={{ width: '60%', marginRight: 8 }} />
+          )}
+          {keys_prep.length > 1 ? (
+            <Icon
+              className="dynamic-delete-button"
+              type="minus-circle-o"
+              disabled={keys_prep.length === 1}
+              onClick={() => this.removeP(k)}
+            />
+          ) : null}
+        </Form.Item>
+      ));
+
+      const formItems4 = keys_tag.map((k, index) => (
+        <Form.Item
+          {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+          label={index === 0 ? 'Tags' : ''}
+          required={false}
+          key={k}
+        >
+          {getFieldDecorator(`tags[${k}]`, {
+            validateTrigger: ['onChange', 'onBlur'],
+            rules: [{
+              required: true,
+              whitespace: true,
+              message: "Veuillez ajouter un tag.",
+            }],
+          })(
+            <Input placeholder="nom du tag" style={{ width: '60%', marginRight: 8 }} />
+          )}
+          {keys_tag.length > 1 ? (
+            <Icon
+              className="dynamic-delete-button"
+              type="minus-circle-o"
+              disabled={keys_tag.length === 1}
+              onClick={() => this.removeT(k)}
+            />
+          ) : null}
+        </Form.Item>
+      ));
+
+      const props = {
+        name: 'file',
+        action: '//jsonplaceholder.typicode.com/posts/',
+        headers: {
+          authorization: 'authorization-text',
+        },
+        onChange(info) {
+          if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+          }
+          if (info.file.status === 'done') {
+            message.success(`${info.file.name} file uploaded successfully`);
+          } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+          }
+        },
+      };
+
         return (
-            <div>
-                <form>
-                    <img src={this.state.image}/>
-                    <input type="file" accept="image/png, image/jpeg"  name="imgUpload"  onChange={this.getBase64}/><br/>   
+            <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+
+                    <Form.Item label="Image">
+                        {getFieldDecorator('upload')(
+                            <Upload {...props} accept="image/png, image/jpeg"  name="imgUpload"  listType="picture">
+                               <Button><Icon type="upload" /> Click to upload</Button>
+                            </Upload>
+                        )}
+                    </Form.Item>
                     
-                    <label>Nom</label><br/>
-                    <input type="text" placeholder="Nom" ref="nom"/><br/><br/>
+                    <Form.Item label="Nom" >
+                    {getFieldDecorator('name', {
+                            rules: [
+                            { required: true, message: 'Please write a name!' },
+                            ],
+                        })(
+                        <Input id="nom"/>
+                        )}
+                    </Form.Item>
 
-                    <label>Difficulté</label><br/>
-                    <input type="number" ref="diff"/><br/><br/>
-                    <Ingredients/>
-                    <Materiaux/>
+                    <Form.Item label="Difficulté" >
+                        {getFieldDecorator('rate', {
+                            initialValue: 3,
+                        })(
+                            <Rate id="diff"/>
+                        )}
+                    </Form.Item>
+                    
+                    {formItems}
+                    <Form.Item {...formItemLayoutWithOutLabel}>
+                        <Button type="dashed" onClick={this.addI} style={{ width: '60%' }}>
+                            <Icon type="plus" /> Ajouter un ingrédient
+                        </Button>
+                    </Form.Item>
 
-                    <label>Nombre pers</label><br/>
-                    <input type="number" ref="pers"/><br/><br/>
+                    {formItems2}
+                    <Form.Item {...formItemLayoutWithOutLabel}>
+                        <Button type="dashed" onClick={this.addM} style={{ width: '60%' }}>
+                            <Icon type="plus" /> Ajouter un ustensile
+                        </Button>
+                    </Form.Item>
 
-                    <Preparation/>
+                    <Form.Item label="Nombre de personnes" >
+                    {getFieldDecorator('nb_pers', {
+                            initialValue: 0,
+                            rules: [
+                            { required: true, message: 'Please write something!' },
+                            ],
+                        })(
+                        <InputNumber/>
+                        )}
+                    </Form.Item>
 
-                    <Tags/>
+                    {formItems3}
+                    <Form.Item {...formItemLayoutWithOutLabel}>
+                        <Button type="dashed" onClick={this.addP} style={{ width: '60%' }}>
+                            <Icon type="plus" /> Ajouter une étape de préparation
+                        </Button>
+                    </Form.Item>
 
-                    <label>Temps de cuisson</label><br/>
-                    <input type="text" ref="cuisson"/><br/><br/>
+                    {formItems4}
+                    <Form.Item {...formItemLayoutWithOutLabel}>
+                        <Button type="dashed" onClick={this.addT} style={{ width: '60%' }}>
+                            <Icon type="plus" /> Ajouter un tag
+                        </Button>
+                    </Form.Item>
 
-                    <label>Temps de préparation</label><br/>
-                    <input type="text" ref="prep"/><br/><br/>
+                    <Form.Item label="Temps de cuisson">
+                    {getFieldDecorator('tps_cuis', {
+                            rules: [
+                            { required: true, message: 'Please write something!' },
+                            ],
+                        })(
+                        <Input />
+                        )}
+                    </Form.Item>
 
-                    <label >Type</label><br/>
-                    <select name="type_select" ref="type">
-                    <option></option>
-                    <option>Classique</option>
-                    <option>Bizarre</option>
-                    </select><br/><br/>
+                    <Form.Item label="Temps de préparation">
+                    {getFieldDecorator('tps_prep', {
+                            rules: [
+                            { required: true, message: 'Please write something!' },
+                            ],
+                        })(
+                        <Input />
+                        )}
+                    </Form.Item>
+                    
+                    <Form.Item label="Select" hasFeedback >
+                    {getFieldDecorator('select', {
+                            rules: [
+                            { required: true, message: 'Please select your type!' },
+                            ],
+                        })(
+                            <Select placeholder="Please select a type" id="type">
+                            <Option value="Classique">Classique</Option>
+                            <Option value="Bizarre">Bizarre</Option>
+                            </Select>
+                        )}
+                     </Form.Item>
 
-
-                    <Link to="/"><input type="button" value="Retour"/></Link>
-                    <input type="button" value={this.state.bouton} onClick={this.writeRecetteData}/>
-                </form>
-            </div>
+                     <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
+                        <Button type="primary" htmlType="submit" onClick={this.writeRecetteData} >Valider</Button>
+                        <Link to="/"><Button type="danger" htmlType="submit" style={{marginLeft:10}}>Retour</Button></Link>
+                    </Form.Item>
+            </Form>
         );
     }
 }
 
-class Ingredients extends React.Component{
-
-    constructor(props){
-        super(props);
-        this.delete = this.delete.bind(this);
-        this.add = this.add.bind(this);
-        this.Ingredient = [];
-    }
-
-    add(){
-
-        var nom = this.refs.nom.value;
-        var qte = this.refs.qte.value;
-        var mesure = this.refs.mesure.value;
-
-        var prod = {nom :nom,
-                    qte : parseInt(qte),
-                    mesure : mesure};
-
-        console.log(this.Ingredient);
-        this.Ingredient.push(prod);
-        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
-
-        this.setState({
-            Ingredient: this.Ingredient
-        });
-        console.log(this.Ingredient);
-    }
-
-    delete(e){
-        var index = e.target.getAttribute('data-key')
-
-        this.Ingredient.splice(index,1);
-
-        console.log(this.Ingredient);
-        this.setState({
-            Ingredient: this.Ingredient
-        });
-        localStorage.setItem('Ingredient', JSON.stringify(this.Ingredient));
-    }
-
-    render(){
-        return(
-            <div>
-                <label>Ingredients</label><br/>
-                <input type="text" placeholder="Nom de l'ingredient" ref="nom"/>
-                <input type="number" placeholder="Quantité" ref="qte"/>
-                <input type="text" placeholder="Unité de mesure" ref="mesure"/>
-                <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
-                <br/><br/>
-                <ul>
-                    {this.Ingredient.map(function(item, index){
-                        return(
-                            <li key={index}>{item.nom} {item.qte} {item.mesure} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
-                        )
-                    }, this)}
-                </ul>
-            </div>
-        );
-    }
-}
-
-class Materiaux extends React.Component{
-
-    constructor(){
-        super();
-        this.delete = this.delete.bind(this);
-        this.state ={
-
-            Materiel: []
-        };
-    }
-
-    add(){
-        var title = this.refs.title.value;
-        var Materiel = [];
-        if(localStorage.getItem('Materiel') == null){
-            Materiel.push(title);
-            localStorage.setItem('Materiel', JSON.stringify(Materiel));
-        }
-        else{
-            Materiel = JSON.parse(localStorage.getItem('Materiel'));
-            Materiel.push(title);
-            localStorage.setItem('Materiel', JSON.stringify(Materiel));
-        }
-        this.setState({
-            Materiel: JSON.parse(localStorage.getItem('Materiel'))
-        });
-    }
-
-    delete(e){
-        var index = e.target.getAttribute('data-key')
-        var list = JSON.parse(localStorage.getItem('Materiel'));
-        list.splice(index,1);
-        this.setState({
-            Materiel: list
-        });
-        localStorage.setItem('Materiel', JSON.stringify(list));
-    }
-    render(){
-        return(
-            <div>
-                <label>Matériel</label><br/>
-                <input type="text" placeholder="Nouveau Materiel..." ref="title"/>
-                <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
-                <br/><br/>
-                <ul>
-                    {this.state.Materiel.map(function(Materiels, index){
-                        return(
-                            <li key={index}>{Materiels} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
-                        )
-                    }, this)}
-                </ul>
-            </div>
-        );
-    }
-}
-
-class Preparation extends React.Component{
-    constructor(){
-        super();
-        this.delete = this.delete.bind(this);
-        this.state ={
-
-            Preparation: []
-        };
-    }
-
-    add(){
-        var title = this.refs.title.value;
-        if(localStorage.getItem('Preparation') == null){
-            var Preparation = [];
-            Preparation.push(title);
-            localStorage.setItem('Preparation', JSON.stringify(Preparation));
-        }
-        else{
-            var Preparation = JSON.parse(localStorage.getItem('Preparation'));
-            Preparation.push(title);
-            localStorage.setItem('Preparation', JSON.stringify(Preparation));
-        }
-        this.setState({
-            Preparation: JSON.parse(localStorage.getItem('Preparation'))
-        });
-    }
-
-    delete(e){
-        var index = e.target.getAttribute('data-key')
-        var list = JSON.parse(localStorage.getItem('Preparation'));
-        list.splice(index,1);
-        this.setState({
-            Preparation: list
-        });
-        localStorage.setItem('Preparation', JSON.stringify(list));
-    }
-    render(){
-        return(
-            <div>
-                <label>Préparation</label><br/>
-                <input type="text" placeholder="Nouvelle étape..." ref="title"/>
-                <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
-                <br/><br/>
-                <ul>
-                    {this.state.Preparation.map(function(Preparation, index){
-                        return(
-                            <li key={index}>{Preparation} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
-                        )
-                    }, this)}
-                </ul>
-            </div>
-        );
-    }
-}
-
-
-class Tags extends React.Component{
-
-    constructor(){
-        super();
-        this.delete = this.delete.bind(this);
-        this.state ={
-
-            Tags: []
-        };
-    }
-
-    add(){
-        var title = this.refs.title.value;
-        if(localStorage.getItem('Tags') == null){
-            var Tags = [];
-            Tags.push(title);
-            localStorage.setItem('Tags', JSON.stringify(Tags));
-        }
-        else{
-            var Tags = JSON.parse(localStorage.getItem('Tags'));
-            Tags.push(title);
-            localStorage.setItem('Tags', JSON.stringify(Tags));
-        }
-        this.setState({
-            Tags: JSON.parse(localStorage.getItem('Tags'))
-        });
-    }
-
-    delete(e){
-        var index = e.target.getAttribute('data-key')
-        var list = JSON.parse(localStorage.getItem('Tags'));
-        list.splice(index,1);
-        this.setState({
-            Tags: list
-        });
-        localStorage.setItem('Tags', JSON.stringify(list));
-    }
-    render(){
-        return(
-            <div>
-                <label>Tags</label><br/>
-                <input type="text" placeholder="Nouveau Tag..." ref="title"/>
-                <input type="button" value="Ajouter" onClick={this.add.bind(this)}/>
-                <br/><br/>
-                <ul>
-                    {this.state.Tags.map(function(Tag, index){
-                        return(
-                            <li key={index}>{Tag} <input type="button" value="supprimer" onClick={this.delete.bind(this)} data-key={index}/></li>
-                        )
-                    }, this)}
-                </ul>
-            </div>
-        );
-    }
-}
-
-export default Form;
+export default Form.create()(Formulaire);
 

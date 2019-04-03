@@ -20,14 +20,14 @@ class Test extends React.Component {
       }
 
       render() {
-        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-        const data = ['Tristan', 'Erwan', 'Valou', 'Navid'];    
+        const { getFieldDecorator } = this.props.form;   
         const formItemLayout = {
           labelCol: { span: 7 },
           wrapperCol: { span: 10 },
         };
             return (
                 <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+                
                     <Form.Item label="Image">
                         {getFieldDecorator('upload', {
                             valuePropName: 'fileList',

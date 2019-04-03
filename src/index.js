@@ -5,7 +5,7 @@ import NavMenu from './NavMenu';
 import Test from './Test';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<Test />, document.getElementById('root'));
+ReactDOM.render(<NavMenu />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
