@@ -1,9 +1,11 @@
 import React from 'react';
 import './App.css';
+import { Alert } from 'antd';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { bdd } from './database';
 import {Form, Select, InputNumber, Button, Upload, Icon, Rate, Input, message} from 'antd';
 import 'antd/dist/antd.css';
+
 
 const { Option } = Select;
 var modif = "";
@@ -121,6 +123,8 @@ class Formulaire extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
+
+
             console.log('Received values of form: ', values);
             var nom = values.name;
             var difficulte = values.rate;
@@ -131,7 +135,38 @@ class Formulaire extends React.Component {
             var ingredient = values.ingredient;
             var materiaux = values.materiaux;
             var preparation = values.preparation;
-            var image =  values.upload.file.thumbUrl;
+            var tag = values.tags;
+
+
+
+              if(typeof tag !== 'undefined' && typeof materiaux!=='undefined' && typeof  preparation!=='undefined' && typeof ingredient!=='undefined' && typeof values.upload!=='undefined'){
+                  console.log(ingredient);
+                  console.log(preparation);
+                  console.log(materiaux);
+                  var image =  values.upload.file.thumbUrl;
+                  this.get();
+
+                  bdd.ref('Recettes/recette_'+this.state.idSup).set({
+                      nom: nom,
+                      difficulte: parseInt(difficulte),
+                      nb_pers: parseInt(nb_pers),
+                      tps_cuisson: tps_cuis,
+                      tps_prep: tps_prep,
+                      type: type,
+                      ingredients: ingredient,
+                      materiels: materiaux,
+                      preparation: preparation,
+                      id: this.state.idSup,
+                      image: image,
+                      tags: tag,
+                  });
+                  this.props.history.push('/');
+              }
+              else{
+                  window.scrollTo(0, 0);
+                  this.setState( {error: "visible"})
+                  //alert("Veuillez remplir tous les champs!")
+              }
               /*
                var file = values.upload.thumbUrl;
                let reader = new FileReader();
@@ -147,25 +182,12 @@ class Formulaire extends React.Component {
                var image = reader.result;*/
                //console.log(image);
 
-            this.get();
-    
-            bdd.ref('Recettes/recette_'+this.state.idSup).set({
-                nom: nom,
-                difficulte: parseInt(difficulte),
-                nb_pers: parseInt(nb_pers),
-                tps_cuisson: tps_cuis,
-                tps_prep: tps_prep,
-                type: type,
-                ingredients: ingredient,
-                materiels: materiaux,
-                preparation: preparation,
-                id: this.state.idSup,
-                image: image,
-             });
-             this.props.history.push('/');
+
           }
           else{
-            alert("Veuillez remplir tous les champs")
+              window.scrollTo(0, 0);
+              this.setState( {error: "visible"})
+            //alert("Veuillez remplir tous les champs!")
           }
         });
       }
@@ -178,6 +200,7 @@ class Formulaire extends React.Component {
         this.state ={
             idSup: "",
             imageUrl:"",
+            error:"hidden",
         };
 
         this.get();
@@ -406,7 +429,19 @@ class Formulaire extends React.Component {
       };
 
         return (
+
             <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+
+                <div  style={{visibility: this.state.error}}>
+                <Alert
+                    message="Attention!"
+                    description="Veuillez remplir tout les champs"
+                    type="error"
+                    showIcon
+
+
+                />
+                </div>
 
                     <Form.Item label="Image">
                         {getFieldDecorator('upload')(
