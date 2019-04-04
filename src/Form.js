@@ -134,6 +134,7 @@ class Formulaire extends React.Component {
             var image =  values.upload.file.thumbUrl;
             
             this.get();
+            
     
             bdd.ref('Recettes/recette_'+this.state.idSup).set({
                 nom: nom,
