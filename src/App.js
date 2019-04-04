@@ -41,12 +41,13 @@ class App extends React.Component{
       dataIndex: '',
       render: (data) => (
         <span>
-            <Link to={"/edit/"+ data.id}><Button type="primary" >Modifier</Button></Link>
+            <Link to={"/edit/"+  data.id}><Button type="primary" >Modifier</Button></Link>
           <Divider type="vertical" />
           <Button type="danger" onClick={this.Supprimer.bind(data.nom, data.id, data.nom)}>Supprimer</Button>
         </span>
       ),
     }];
+     this.Supprimer=this.Supprimer.bind(this);
 }
 
 Supprimer(id, nom, index) {
@@ -61,12 +62,15 @@ Supprimer(id, nom, index) {
                     console.log('id : '+id);
                     console.log('nom : '+nom);
                     console.log('index : '+index);
+
                     bdd.ref('/Recettes/').once('value', (snapshot)=> {
                             var data = snapshot.val();
                             let recettes = Object.values(data);
                             this.setState({recette: recettes});
                         }
                     );
+
+
                 }
             },
             {
@@ -75,6 +79,10 @@ Supprimer(id, nom, index) {
             }
         ]
     });
+
+}
+
+majbdd(){
 
 }
 
