@@ -173,6 +173,7 @@ class Formulaire extends React.Component {
 
     componentDidMount(){
         if (typeof this.props.match.params.id !== 'undefined') {
+
             modif = "1";
             bdd.ref('/Recettes/recette_'+this.props.match.params.id).once('value', (snapshot) => {
                     var data = snapshot.val();
