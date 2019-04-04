@@ -41,7 +41,7 @@ class App extends React.Component{
       dataIndex: '',
       render: (data) => (
         <span>
-          <Button type="primary" >Modifier</Button>
+            <Link to={"/edit/"+ data.id}><Button type="primary" >Modifier</Button></Link>
           <Divider type="vertical" />
           <Button type="danger" onClick={this.Supprimer.bind(data.nom, data.id, data.nom)}>Supprimer</Button>
         </span>
