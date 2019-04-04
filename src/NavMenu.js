@@ -16,7 +16,6 @@ function NavMenu() {
       <div>
         <Route exact path="/" component={App} />
         <Route path="/add" component={Form} />
-          <Route path="/edit" component={Form} />
         <Route path="/edit/:id" component={Form} />
       </div>
     </Router>
