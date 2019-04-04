@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import NavMenu from './NavMenu';
-import Test from './Test';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<NavMenu />, document.getElementById('root'));
