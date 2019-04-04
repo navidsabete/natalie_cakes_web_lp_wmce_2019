@@ -16,7 +16,8 @@ class App extends React.Component{
 
   constructor(props) {
     super(props);
-    this.state = {recette: [], donnees: []};
+    this.recherche = this.recherche.bind(this);
+    this.state = {recette: [], donnees: [], tmp_recette: []};
      this.columns = [{
       title: 'Image',
       dataIndex: 'image',
@@ -82,24 +83,24 @@ Supprimer(id, nom, index) {
 
 }
 
-majbdd(){
-
+recherche(value){
+  let search = this.state.tmp_recette.filter(({nom})=> nom.includes(value) || nom.includes(value.toLowerCase()) || nom.includes(value.substring(0,1).toUpperCase()+value.substring(1)));
+  this.setState({recette: search});
 }
 
   componentDidMount(){
     bdd.ref('/Recettes/').once('value', (snapshot)=> {
       var data = snapshot.val();
       let recettes = Object.values(data);
-      this.setState({recette: recettes});
+      this.setState({recette: recettes, tmp_recette: recettes});
     }     
   );
   }
  
   render() {
-    console.log(this.state.recette);
     return(
         <div className="pos">
-          <Search placeholder="Recherche..." onSearch={value => console.log(value)} enterButton style={{width: "200px",marginRight:"10px"}}/>
+          <Search placeholder="Recherche..." onSearch={this.recherche} enterButton style={{width: "200px",marginRight:"10px"}}/>
             <Link to="/add"><Button><Icon type="plus-circle" /></Button></Link>
             <Table columns={this.columns} dataSource={this.state.recette} style={{marginTop:"20px"}}/>
 

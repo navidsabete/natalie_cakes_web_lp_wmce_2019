@@ -132,21 +132,7 @@ class Formulaire extends React.Component {
             var materiaux = values.materiaux;
             var preparation = values.preparation;
             var image =  values.upload.file.thumbUrl;
-              /*
-               var file = values.upload.thumbUrl;
-               let reader = new FileReader();
-               reader.readAsDataURL(file);
-               console.log(reader.result);
-
-               reader.onload = () => {
-                 this.setState({
-                   image: reader.result
-                 })
-               };
-
-               var image = reader.result;*/
-               //console.log(image);
-
+            
             this.get();
     
             bdd.ref('Recettes/recette_'+this.state.idSup).set({
